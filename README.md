@@ -1,2 +1,2 @@
-<h1>Nicol Niyireth Lopez Lozano</h1>
-
+<h2> Hi, I'm Nicoll Lopez</h2>
+<img src="" >
