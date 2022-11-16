@@ -1,0 +1,158 @@
+// MongoDB
+// Nicoll Niyireth López Lozano
+/*
+Autor: @BrayanTorres2
+Empresa: Universidad Ean
+*/
+const database = 'Compañia';
+const collection = 'empleados';
+
+
+
+// Create a new collection.
+//db.createCollection(collection);
+//----------------------------------------
+//Para consultar todas las bases de datos
+//show databases
+//------------------------------------------
+// Seleccione la base de datos que desea utilizar.
+// Create a new database.
+use(database);
+//-------------------------------------------Eliminar tabla--------------
+// El comando drop() destruye todos los datos de una colección.
+//Asegúrese de ejecutarlo en la base de datos y la colección correctas.
+db.empleados.drop();
+//------------------------------------------------Insertar varios-----------
+// Inserte algunos documentos en la colección de empleados.
+// el insertMany nos sirve cuando queremos agregar variaos documentos
+
+db.empleados.insertMany([
+  { '_id': 1, "nombre": 'Juan',   'apellido': 'Torres', 'Cargo': 'Ingeniero en jefe', 'Nomina': 10000000, 'fechadecontratación': new Date('2014-03-01T08:00:00Z'),'estado':true, "empresa": {"_id": ObjectId(11)} },
+  { '_id': 2, 'nombre': 'Brayan', 'apellido': 'Torres', 'Cargo': 'Profesor', 'Nomina': 9000000, 'fecha de contratación': new Date('2014-10-01T08:00:00Z'),'estado':true, "empresa": {"_id": ObjectId(11)} },
+  { '_id': 3, 'nombre': 'Stiven', 'apellido': 'Torres', 'Cargo': 'Lider de recursos humanos', 'Nomina': 2000000, 'fechadecontratación': new Date('2014-03-15T09:00:00Z'),'estado':true, "empresa": {"_id": ObjectId(11)}  },
+  { '_id': 4, 'nombre': 'Jesica', 'apellido': 'Perez',  'Cargo': 'Administrador', 'Nomina':3000000  , 'fechadecontratación': new Date('2014-04-04T11:21:39.736Z'),'estado':true, "empresa": {"_id": ObjectId(11)}  },
+  { '_id': 5, 'nombre': 'Viviana','apellido': 'Perez',  'Cargo': 'Software engineer', 'Nomina': 20000000, 'fechadecontratación ': new Date('2014-04-04T21:23:13.331Z'),'estado':true, "empresa": {"_id": ObjectId(14)}  },
+  { '_id': 6, 'nombre': 'Ana',    'apellido': 'Perez',  'Cargo': 'Ingeniero Químico', 'Nomina': 1500000, 'fechadecontratación ': new Date('2018-06-04T05:08:13Z'),'estado':true, "empresa": {"_id": ObjectId(11)}  },
+  { '_id': 7, 'nombre': 'Maria',  'apellido': 'Sanchez','Cargo': 'Ingeniero Industrial', 'Nomina': 1400000, 'fechadecontratación ': new Date('2019-09-10T08:43:00Z'),'estado':true, "empresa": {"_id": ObjectId(13)}  },
+  { '_id': 8, 'nombre': 'William','apellido': 'Sanchez','Cargo': 'Gerente General', 'Nomina': 50000, 'fechadecontratación ': new Date('2022-02-06T20:20:13Z'),'estado':true, "empresa": {"_id": ObjectId(11)}  },
+]);
+
+//-------------------------------------------------------------Insertar uno------
+//Inserte solo un documento en la colección de empleados
+var fecha1= new Date(1999,08,04)//otra manera de insertar una fecha es creando una instancia afuera
+db.empleados.insertOne({'_id': 9, 'nombre': 'Pedro',   'apellido': 'Torres', 'Cargo': 'Ingeniero en jefe', 'Nomina': 10000000, 'fechadecontratación':fecha1, 'estado':true,"empresa": ObjectId("625909d32d0f29db8087dae1")})
+//------------------------------------------------------------
+//Otra forma de insertar con fecha y sin _id
+db.empleados.insertOne({'nombre': 'Juanita',   'apellido': 'Torres', 'Cargo': 'Ingeniero en jefe', 'Nomina': 10000000, 'fechadecontratación':ISODate('2016-02-06T20:20:13Z'), 'estado':true, "empresa": ObjectId("625909d32d0f29db8087dae1")})
+//---------Inner Join-----
+//traer todos los empleados que trabajen en la empresa _id 11
+/*
+db.empresa.aggregate([
+    {
+        $match: {
+            _id: ObjectId("625909d32d0f29db8087dae1")
+            }
+    }
+    ,{
+        $lookup: {
+            from: "empleados",
+            localField: "_id",
+            foreignField: "empresa",
+            as: "empleados "
+            }
+    }
+    ]);
+*/
+//db.empleados.find()
+
+//-------------------------------------------- Consultas-----------------------
+//Consultar todos los datos de la tabla
+db.empleados.find({});
+//---------------------------------------------
+//Consultar el empleado con _id numero 9
+db.empleados.find({_id:9})
+//-----------------------------------------------
+//Consultar todos los empleados que su apellido sea "Torres"
+db.empleados.find({'apellido':'Torres'})
+//-------------------------------------------
+//Consultar los primeros tres registros insertados
+db.empleados.find({}).limit(3)
+//-------------------------------------------------------------Operadores Relacionales---------
+/*
+gt= greater than >
+gte= greater than equal >=
+lt= lower than <
+lte= lower than equal <=
+*/
+//---------------------------------------------
+//Consultar todos los empleados con fecha de contratación mayor a 1999
+db.getCollection("empleados").find({"fechadecontratación": {$gt:new Date('1999-01-01')}})
+//---------------------------------------------------------Actualizar o Modificar-----------------------------
+//Modificar el apellido de Maria por "Zanabria"
+db.empleados.updateOne({'_id':7},{$set:{'apellido':'Zanabria'}})
+db.empleados.find({})
+//---------------------------------------------------
+//Modificar el estado en la compañia para todos los empleados que fueron contradados menor o igual 1999-10-1 a false
+db.empleados.updateMany({'fechadecontratación':{$lte:new Date('1999-10-01')}},{$set:{'estado':false}})
+db.empleados.find({})
+//-----------------------------------------------------
+//Modificar la estructura del documento de Brayan ahora solo tendra nombre,cargo y un nuevo atributo llamado empleado_destacado:true
+db.empleados.replaceOne({'_id':2},{'nombre':'Brayan','Cargo':'Profesor','empleado_destacado':true})
+db.empleados.find({"_id":2})
+//-------------------------------------------------------------------Eliminar----------
+//eliminar el documento con _id numero 2
+db.empleados.deleteOne({'_id':2}) 
+db.empleados.find({})
+//-----------------------------------------
+//eliminar todos los documentos que su estado sea false
+db.empleados.deleteMany({'estado':false})
+db.empleados.find({})
+
+
+//ACTIVIDADES
+
+// Primer Punto 
+
+db.empleados.insertOne({'_id': 54, 'nombre': 'Juan Jose','apellido': 'Suarez', 'Cargo': 'Ingeniero mecatronico','Nomina': 3400000,'fechadecontratación':ISODate('2021-11-11T21:23:13.331Z'),'estado':true,"empresa": ObjectId("14")})
+db.empleados.find({})
+
+//Segundo Punto
+
+db.empleados.insertOne({'_id': 41, 'nombre': 'Luis','apellido': 'Gonzales', 'Cargo': 'Auxiliar de ventas','Nomina': 1000000,'fechadecontratación':ISODate('2021-11-11T21:23:13.331Z'),'estado':true,"empresa": ObjectId("15")})
+db.empleados.find({})
+db.empleados.insertOne({'_id': 36, 'nombre': 'Manuel','apellido': 'Hernandez', 'Cargo': 'Contador publico','Nomina': 3000000,'fechadecontratación':ISODate('2021-11-11T21:23:13.331Z'),'estado':true,"empresa": ObjectId("19")})
+db.empleados.find({})
+
+// Punto Tres
+
+
+// Punto Cuatro
+
+db.empresa.insertMany([
+  {'id_': 49, 'nombre': "Amazon",'direccion' : "Engativá, Bogotá",'telefono' : "123456789",'fecha_de_creacion': new Date('1985-12-06T10:48:13Z')}, 
+  {'id_': 45, 'nombre': "Amazon",'direccion' : "Av. Boyacá #80-94, Bogotá",'telefono' : "9876546321",'fecha_de_creacion': new Date('1999-02-06T20:20:13Z'')}, 
+  {'id_': 52, 'nombre': "Apple",'direccion' : "C. 19A #72-57, Fontibón, Bogotá, Cundinamarca",'telefono' : "789123465",'fecha_de_creacion': new Date('2000-10-06T15:20:40Z'')},
+  {'id_': 36, 'nombre': "Mercado Libre",'direccion' : "Cra. 17 #93-09, Usaquén, Bogotá, Colombia",'telefono' : "456789132",'fecha_de_creacion': new Date('2015-02-06T20:25:13Z'')},
+  {'id_': 47, 'nombre': "Xiaomi",'direccion' : "Av Cr 86 # 55A-75, Centro Comercial Nuestro, Cra. 86, Bogotá",'telefono' : "987456321",'fecha_de_creacion': new Date('2012-11-06T20:20:13Z'')},
+]);
+
+// Punto Cinco
+
+db.empleados.updateMany({}, {$set: {empresa_id: {$toObjectId: "$empresa"}}})
+
+// Punto Seis 
+
+db.empleados.find({'empresa_id': 45});
+db.empleados.find({'empresa_id': 36});
+
+// Punto Siete
+
+db.empleados.deleteMany({'empresa_id': 36});
+
+// Punto Ocho
+
+db.empresa.updateOne({'_id': 47}, {$set: {'nombre': 'Universidad Ean'}});
+
+// Punto Nueve
+
+db.empleados.find({'Nomina': {$gte: 1000000, $lte: 6000000}});
